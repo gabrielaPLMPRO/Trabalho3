@@ -1,9 +1,11 @@
 let token = '';
 const apiKey = '8175fA5f6098c5301022f475da32a2aa';
+let start = 1; // Alterado para let
+const quantity = 12;
 
 function authenticate() {
     console.log('Starting authentication...');
-    showLoading();  // Exibe o spinner ao iniciar a requisição
+    showLoading();
     axios.post('https://ucsdiscosapi.azurewebsites.net/Discos/autenticar', null, {
         headers: {
             'ChaveApi': apiKey
@@ -14,41 +16,34 @@ function authenticate() {
         token = response.data;
         if (token) {
             console.log('Authenticated successfully, Token:', token);
-            loadAlbums(0, 12);
+            loadAlbums(start, quantity);
         } else {
             console.error('Failed to retrieve token');
-            hideLoading(); // Esconde o loading caso o token não seja obtido
+            hideLoading();
         }
     })
     .catch(error => {
         console.error('Error during authentication:', error);
-        hideLoading();  // Esconde o loading em caso de erro
+        hideLoading();
     });
 }
 
-async function loadAlbums(start, quantity) {
+async function loadAlbums(numeroInicio, quantidade) {
+    showLoading();
     console.log('Starting to load albums...');
     if (!token) {
         console.error('Token is not available. Cannot load albums.');
-        hideLoading();  // Esconde o loading caso o token não esteja disponível
+        hideLoading();
         return;
     }
 
-    if (start < 1) {
-        start = 1;
-    }
-
-    if (quantity < 1 || quantity > 12) {
-        quantity = 12;
-    }
-
-    console.log(`numeroInicio: ${start}, quantidade: ${quantity}`);
+    console.log(`numeroInicio: ${numeroInicio}, quantidade: ${quantidade}`);
 
     try {
         const response = await axios.get('https://ucsdiscosapi.azurewebsites.net/Discos/records', {
             params: {
-                numeroInicio: start,
-                quantidade: quantity
+                numeroInicio: numeroInicio,
+                quantidade: quantidade
             },
             headers: {
                 'TokenApiUCS': token
@@ -61,15 +56,17 @@ async function loadAlbums(start, quantity) {
             albums.forEach(album => {
                 displayAlbum(album);
             });
+            start += quantity; // Atualiza start para o próximo lote
         } else {
             console.error("No albums returned from API.");
         }
     } catch (error) {
         console.error('Error loading albums:', error);
     } finally {
-        // Aqui garantimos que o hideLoading será chamado ao final
-        setTimeout(hideLoading, 500); // Usamos o setTimeout para garantir a execução
+        setTimeout(hideLoading, 500);
     }
+
+    
 }
 
 function displayAlbum(album) {
@@ -85,10 +82,12 @@ function displayAlbum(album) {
 
     albumElement.innerHTML = `
         <div class="card">
-            <img src="data:image/jpeg;base64,${album.imagemEmBase64}" alt="Album Image">
-            <div class="card-body">
-                <h5 class="card-title">${album.name}</h5>
-            </div>
+            <img src="${imageUrl}" alt="Album Image">
+            <div id="card${album.id}" class="card-body">
+                <h5 class="card-title">${album.id}</h5>
+                <h5 class="card-title">${album.descricaoPrimaria}</h5>
+                <h5 class="card-title">${album.descricaoSecundaria}</h5>
+            </div>    
         </div>
     `;
 
@@ -101,24 +100,17 @@ function displayAlbum(album) {
 
 function openAlbumModal(album) {
     console.log('Opening album modal for:', album);
-    const modal = document.getElementById('album-modal');
-    modal.querySelector('.modal-title').innerText = album.name;
-    modal.querySelector('.modal-body').innerHTML = `
-        <p><strong>Artist:</strong> ${album.artist}</p>
-        <p><strong>Release Year:</strong> ${album.releaseYear}</p>
-        <p><strong>Description:</strong> ${album.description}</p>
-    `;
-    $('#album-modal').modal('show');
+    document.getElementById('card' + album.id).style.cssText = 'display:block !important';
 }
 
 function showLoading() {
     console.log('Showing loading spinner...');
-    document.getElementById('loading').style.display = 'flex';  // Exibe o spinner enquanto carrega
+    document.getElementById('loading').style.cssText = 'display:flex !important';
 }
 
 function hideLoading() {
     console.log('Hiding loading spinner...');
-    document.getElementById('loading').style.display = 'none';  // Esconde o spinner quando os dados terminam de carregar
+    document.getElementById('loading').style.cssText = 'display:none !important';
 }
 
 authenticate();
