@@ -4,34 +4,38 @@ let start = 1;
 const quantity = 12;
 const incremento = 4;
 const registros = 104;
+const urlAutenticacao = 'https://ucsdiscosapi.azurewebsites.net/Discos/autenticar'
+const urlRecords = 'https://ucsdiscosapi.azurewebsites.net/Discos/records'
 let isLoading = false; // Evita chamadas concorrentes
 
 function autenticacao() {
     mostrarLoading();
-    axios.post('https://ucsdiscosapi.azurewebsites.net/Discos/autenticar', null, {
+    $.ajax({
+        url: urlAutenticacao,
+        method: 'POST',
         headers: {
             'ChaveApi': apiKey
+        },
+        success: function(response) {
+            token = response;
+            if (token) {
+                loadAlbums(start, quantity);
+                setupScroll();
+            } else {
+                console.error('Falha ao gerar token.');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro durante a autenticação', error);
+        },
+        complete: function() {
+            esconderLoading();
         }
-    })
-    .then(response => {
-        token = response.data;
-        if (token) {
-            console.log('Token:', token);
-            loadAlbums(start, quantity);
-            setupScroll();
-        } else {
-            console.error('Falha ao gerar token.');
-        }
-    })
-    .catch(error => {
-        console.error('Erro durante a autenticação', error);
-    })
-    .finally(() => {
-        esconderLoading();
     });
 }
 
-async function loadAlbums(numeroInicio, quantidade) {
+
+function loadAlbums(numeroInicio, quantidade) {
     if (isLoading) return;
     isLoading = true;
     mostrarLoading();
@@ -43,42 +47,46 @@ async function loadAlbums(numeroInicio, quantidade) {
         return;
     }
 
-    try {
-        const response = await axios.get('https://ucsdiscosapi.azurewebsites.net/Discos/records', {
-            params: {
-                numeroInicio: numeroInicio,
-                quantidade: quantidade
-            },
-            headers: {
-                'TokenApiUCS': token
-            }
-        });
+    $.ajax({
+        url: urlRecords,
+        type: 'GET',
+        data: {
+            numeroInicio: numeroInicio,
+            quantidade: quantidade
+        },
+        headers: {
+            'TokenApiUCS': token
+        },
+        success: function(response) {
+            const albums = response;
+            if (albums && albums.length > 0) {
+                if (start === 1) {
+                    document.getElementById('album-list').innerHTML = '';
+                }
 
-        const albums = response.data;
-        if (albums && albums.length > 0) {
-            if (start === 1) {
-                document.getElementById('album-list').innerHTML = '';
-            }
+                albums.forEach(album => {
+                    displayAlbum(album);
+                });
 
-            albums.forEach(album => {
-                displayAlbum(album);
-            });
-
-            if (start + quantidade > registros) {
-                start = 1;
+                if (start + quantidade > registros) {
+                    start = 1;
+                } else {
+                    start += quantidade;
+                }
             } else {
-                start += quantidade;
+                console.error("Nenhum álbum retornado.");
             }
-        } else {
-            console.error("Nenhum álbum retornado.");
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro ao carregar os álbuns:', error);
+        },
+        complete: function() {
+            esconderLoading();
+            isLoading = false; // Libera a flag pra próxima chamada
         }
-    } catch (error) {
-        console.error('Erro ao carregar os álbuns:', error);
-    } finally {
-        esconderLoading();
-        isLoading = false; // Libera a flag pra próxima chamada
-    }
+    });
 }
+
 
 function displayAlbum(album) {
     const albumContainer = document.getElementById('album-list');
