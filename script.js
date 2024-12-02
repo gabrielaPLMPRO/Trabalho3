@@ -3,7 +3,7 @@ const apiKey = '8175fA5f6098c5301022f475da32a2aa';
 let start = 1;
 const quantity = 12;
 const incremento = 4;
-const registros = 104; // Ajuste para 104
+const registros = 104;
 let isLoading = false; // Evita chamadas concorrentes
 
 function authenticate() {
