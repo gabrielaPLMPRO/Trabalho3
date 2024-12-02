@@ -3,7 +3,7 @@ const apiKey = '8175fA5f6098c5301022f475da32a2aa';
 let start = 1;
 const quantity = 12;
 const incremento = 4;
-const registros = 104; // Ajuste para 104
+const registros = 104;
 let isLoading = false; // Evita chamadas concorrentes
 
 function authenticate() {
@@ -88,14 +88,14 @@ function displayAlbum(album) {
 
     const imageUrl = album.imagemEmBase64 ? `data:image/jpeg;base64,${album.imagemEmBase64}` : 'https://via.placeholder.com/150';
 
-    albumElement.innerHTML = ` 
+    albumElement.innerHTML = `
         <div class="card">
             <img src="${imageUrl}" alt="Album Image">
-            <div id="card${album.id}" class="card-body">
+            <div class="card-body">
                 <h5 class="card-title">${album.id}</h5>
                 <h5 class="card-title">${album.descricaoPrimaria}</h5>
                 <h5 class="card-title">${album.descricaoSecundaria}</h5>
-            </div>    
+            </div>
         </div>
     `;
 
@@ -107,13 +107,15 @@ function displayAlbum(album) {
 }
 
 function openAlbumModal(album) {
-    const cardBody = document.getElementById('card' + album.id);
+    const modal = new bootstrap.Modal(document.getElementById('albumModal'));
+    document.getElementById('modalAlbumId').innerText = `ID: ${album.id}`;
+    document.getElementById('modalPrimaryDesc').innerText = album.descricaoPrimaria;
+    document.getElementById('modalSecondaryDesc').innerText = album.descricaoSecundaria;
+    
+    const imageUrl = album.imagemEmBase64 ? `data:image/jpeg;base64,${album.imagemEmBase64}` : 'https://via.placeholder.com/150';
+    document.getElementById('modalAlbumImage').src = imageUrl;
 
-    if (cardBody.style.display === 'none' || cardBody.style.display === '') {
-        cardBody.style.display = 'block';
-    } else {
-        cardBody.style.display = 'none';
-    }
+    modal.show();
 }
 
 function showLoading() {
