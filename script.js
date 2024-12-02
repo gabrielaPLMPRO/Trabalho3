@@ -3,8 +3,8 @@ const apiKey = '8175fA5f6098c5301022f475da32a2aa';
 let start = 1;
 const quantity = 12;
 const incremento = 4;
-const registros = 105;
-let isLoading = false; // Para evitar chamadas concorrentes
+const registros = 104; // Ajuste para 104
+let isLoading = false; // Evita chamadas concorrentes
 
 function authenticate() {
     showLoading();
@@ -21,21 +21,23 @@ function authenticate() {
             setupInfiniteScroll();
         } else {
             console.error('Falha ao gerar token.');
-            hideLoading();
         }
     })
     .catch(error => {
         console.error('Erro durante a autenticação', error);
+    })
+    .finally(() => {
         hideLoading();
     });
 }
 
 async function loadAlbums(numeroInicio, quantidade) {
-    if (isLoading) return; // Evita chamadas concorrentes
+    if (isLoading) return;
     isLoading = true;
     showLoading();
+
     if (!token) {
-        console.error('Token não está disponível. Não foi possível carregar os albuns.');
+        console.error('Token não está disponível. Não foi possível carregar os álbuns.');
         hideLoading();
         isLoading = false;
         return;
@@ -54,20 +56,27 @@ async function loadAlbums(numeroInicio, quantidade) {
 
         const albums = response.data;
         if (albums && albums.length > 0) {
+            if (start === 1) {
+                document.getElementById('album-list').innerHTML = '';
+            }
+
             albums.forEach(album => {
                 displayAlbum(album);
             });
 
-            // Atualiza `start` para o próximo lote, reiniciando quando atingir o limite
-            start = (start + quantidade > registros) ? 1 : start + quantidade;
+            if (start + quantidade > registros) {
+                start = 1;
+            } else {
+                start += quantidade;
+            }
         } else {
-            console.error("Nenhum album retornado.");
+            console.error("Nenhum álbum retornado.");
         }
     } catch (error) {
-        console.error('Erro ao carregar os albums:', error);
+        console.error('Erro ao carregar os álbuns:', error);
     } finally {
         hideLoading();
-        isLoading = false; // Libera o sinalizador para a próxima chamada
+        isLoading = false; // Libera a flag pra próxima chamada
     }
 }
 
@@ -79,7 +88,7 @@ function displayAlbum(album) {
 
     const imageUrl = album.imagemEmBase64 ? `data:image/jpeg;base64,${album.imagemEmBase64}` : 'https://via.placeholder.com/150';
 
-    albumElement.innerHTML = `
+    albumElement.innerHTML = ` 
         <div class="card">
             <img src="${imageUrl}" alt="Album Image">
             <div id="card${album.id}" class="card-body">
@@ -98,7 +107,13 @@ function displayAlbum(album) {
 }
 
 function openAlbumModal(album) {
-    document.getElementById('card' + album.id).style.cssText = 'display:block !important';
+    const cardBody = document.getElementById('card' + album.id);
+
+    if (cardBody.style.display === 'none' || cardBody.style.display === '') {
+        cardBody.style.display = 'block';
+    } else {
+        cardBody.style.display = 'none';
+    }
 }
 
 function showLoading() {
