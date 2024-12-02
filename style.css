@@ -1,0 +1,29 @@
+#loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+#gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.gallery-item {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .gallery-item {
+      width: 48%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .gallery-item {
+      width: 31%;
+  }
+}
