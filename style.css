@@ -4,7 +4,7 @@
 }
 
 .album img {
-  width: 100%;
+  width: 100%; 
   height: 420px;
   object-fit: cover;
   cursor: pointer;
@@ -28,22 +28,40 @@
 }
 
 .card-body {
-  display: none !important;
+  display: none;
 }
 
-/* Responsividade */
+/* Responsividade pra telas grandes */
 @media (min-width: 768px) {
-  .album-container {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+  #album-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .album {
+    width: 100%;
+  }
+
+  .album img {
+    width: 100%; 
+    height: 420px;
   }
 }
 
 @media (max-width: 767px) {
-  .album-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
+  #album-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .album {
+    width: 100%;
+  }
+
+  .album img {
+    width: 100%;
+    height: 300px;
   }
 }
