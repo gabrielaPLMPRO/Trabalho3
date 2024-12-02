@@ -6,8 +6,8 @@ const incremento = 4;
 const registros = 104;
 let isLoading = false; // Evita chamadas concorrentes
 
-function authenticate() {
-    showLoading();
+function autenticacao() {
+    mostrarLoading();
     axios.post('https://ucsdiscosapi.azurewebsites.net/Discos/autenticar', null, {
         headers: {
             'ChaveApi': apiKey
@@ -18,7 +18,7 @@ function authenticate() {
         if (token) {
             console.log('Token:', token);
             loadAlbums(start, quantity);
-            setupInfiniteScroll();
+            setupScroll();
         } else {
             console.error('Falha ao gerar token.');
         }
@@ -27,18 +27,18 @@ function authenticate() {
         console.error('Erro durante a autenticação', error);
     })
     .finally(() => {
-        hideLoading();
+        esconderLoading();
     });
 }
 
 async function loadAlbums(numeroInicio, quantidade) {
     if (isLoading) return;
     isLoading = true;
-    showLoading();
+    mostrarLoading();
 
     if (!token) {
         console.error('Token não está disponível. Não foi possível carregar os álbuns.');
-        hideLoading();
+        esconderLoading();
         isLoading = false;
         return;
     }
@@ -75,7 +75,7 @@ async function loadAlbums(numeroInicio, quantidade) {
     } catch (error) {
         console.error('Erro ao carregar os álbuns:', error);
     } finally {
-        hideLoading();
+        esconderLoading();
         isLoading = false; // Libera a flag pra próxima chamada
     }
 }
@@ -118,15 +118,15 @@ function openAlbumModal(album) {
     modal.show();
 }
 
-function showLoading() {
+function mostrarLoading() {
     document.getElementById('loading').style.cssText = 'display:flex !important';
 }
 
-function hideLoading() {
+function esconderLoading() {
     document.getElementById('loading').style.cssText = 'display:none !important';
 }
 
-function setupInfiniteScroll() {
+function setupScroll() {
     window.addEventListener('scroll', () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
             loadAlbums(start, incremento);
@@ -134,4 +134,4 @@ function setupInfiniteScroll() {
     });
 }
 
-authenticate();
+autenticacao();
