@@ -4,18 +4,14 @@
 }
 
 .album img {
-  width: 100%; 
-  height: 420px; 
-  object-fit: cover; 
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
   cursor: pointer;
 }
 
 #loading {
   display: none !important;
-}
-
-.modal-body p {
-  margin: 5px 0;
 }
 
 #loading {
@@ -31,6 +27,23 @@
   align-items: center;
 }
 
-.card-body{
-  display:none !important;
+.card-body {
+  display: none !important;
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+  .album-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .album-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+  }
 }
