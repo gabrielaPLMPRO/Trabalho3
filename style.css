@@ -1,6 +1,7 @@
 .album {
   margin-bottom: 20px;
   text-align: center;
+  width: 100%;
 }
 
 .album img {
@@ -31,37 +32,28 @@
   display: none;
 }
 
+#album-list {
+  display: grid;
+  gap: 20px;
+}
+
 /* Responsividade pra telas grandes */
 @media (min-width: 768px) {
   #album-list {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .album {
-    width: 100%;
   }
 
   .album img {
-    width: 100%; 
     height: 420px;
   }
 }
 
 @media (max-width: 767px) {
   #album-list {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .album {
-    width: 100%;
   }
 
   .album img {
-    width: 100%;
     height: 300px;
   }
 }
